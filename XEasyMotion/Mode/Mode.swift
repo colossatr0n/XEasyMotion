@@ -108,20 +108,33 @@ class Mode {
     }
     
     static func addLastPosition(){
-        self.positionHistory.append(getPosition())
+        let position = getPosition()
+        if self.positionHistory.isEmpty || position != self.positionHistory.last! {
+            self.positionHistory.append(position)
+        }
 //        Log.write(errLevel: Log.INFO, catelog: "postion", value: self.postionStack.count)
     }
     
     static func addLastClickPosition(){
         // If click history contains less than 10 clicks
-        if self.clickHistory.count < 10 {
+        if self.clickHistory.count + self.clickHistoryTraversal.count < 10 {
             let position = getPosition()
-            // If first click or last click is not the same as the previous click, add click
-            if self.clickHistory.isEmpty || position != self.clickHistory.last! {
-                self.clickHistory.append(position)
+            // If the click history isn't being traversed
+            if (self.clickHistoryTraversal.isEmpty) {
+                // If is first click or last click is not the same as the previous click, add click, append to history
+                if self.clickHistory.isEmpty || position != self.clickHistory.last! {
+                    self.clickHistory.append(position)
+                }
+            // Otherwise, click history has been traversed, so insert click as oldest traversal (most recent click) so the click history can later be rebuilt properly
+            } else if position != self.clickHistoryTraversal.first! {
+                self.clickHistoryTraversal.insert(position, at: 0)
             }
         } else { // otherwise remove the earliest click and add the latest
-            self.clickHistory.remove(at: 0)
+            if self.clickHistory.isEmpty {
+                self.clickHistoryTraversal.popLast()
+            } else {
+                self.clickHistory.remove(at: 0)
+            }
             addLastClickPosition()
         }
 //        Log.write(errLevel: Log.INFO, catelog: "postion", value: self.postionStack.count)
@@ -140,6 +153,7 @@ class Mode {
     
     static func goToPreviousClickPosition() {
         if let positionInfo = self.clickHistory.popLast() {
+            addLastPosition()
             self.clickHistoryTraversal.append(positionInfo)
             goToPosition(positionInfo: positionInfo)
         }
