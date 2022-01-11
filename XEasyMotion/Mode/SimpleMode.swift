@@ -49,11 +49,11 @@ class SimpleMode : Mode{
     
     override static func addClickBinds() {
         HotKeys.register(keycode: UInt32(kVK_Return), modifiers: UInt32(activeFlag), block:{_ in
-            addClickBind(clickFunc: Util.click)
+            performClick(clickFunc: Util.click)
         });
         
         HotKeys.register(keycode: UInt32(kVK_Return), modifiers: UInt32(shiftKey), block:{_ in
-            addClickBind(clickFunc: Util.rightClick)
+            performClick(clickFunc: Util.rightClick)
         });
     }
     
@@ -68,7 +68,7 @@ class SimpleMode : Mode{
         });
     }
         
-    private static func addClickBind(clickFunc: @escaping (CGFloat, CGFloat) -> Void) {
+    private static func performClick(clickFunc: @escaping (CGFloat, CGFloat) -> Void) {
         DispatchQueue.global().async {
             self.addLastClickPosition()
             let (x,y) = self.getWinCenterPoint()
@@ -97,6 +97,7 @@ class SimpleMode : Mode{
         HotKeys.unregister(id: UInt32(kVK_ANSI_U + activeFlag))
         HotKeys.unregister(id: UInt32(kVK_ANSI_I + activeFlag))
         HotKeys.unregister(id: UInt32(kVK_ANSI_O + controlKey))
+        HotKeys.unregister(id: UInt32(kVK_ANSI_Period + activeFlag))
     }
     
     static func draw(){
